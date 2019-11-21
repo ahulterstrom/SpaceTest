@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="window" @mousedown="captureOn" @mouseup="captureOff" @mousemove="mo">
+            <div id="ui">
+                <div id="zoombuttons">
+                    <input type="button" v-on:click.prevent="zoomin" value="+">
+                    <input type="button" v-on:click.prevent="zoomout" value="-">
+                </div>
+            </div>
+            
+            v-bind:style="zoomStyleObject"
+            
+            <div id="map" v-bind:style="styleObject">
+                <div id="background" class="layer">
+                    <div id="row" v-for="row in divs">
+                        <div class="cell bgcell" v-for="cell in row"></div>
+                    </div>
+                </div>
+                <div id="planets" class="layer">
+                    <div id="row" v-for="row in planets">
+                        <div class="cell" v-for="cell in row"><img v-bind:src="cell"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!--<script src="https://unpkg.com/vue-dragscroll"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.2/dist/vue.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
