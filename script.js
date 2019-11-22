@@ -1,30 +1,28 @@
 var app = new Vue({
     el: '#app',
     data: {
-        variable: 'hello',
         divs: [],
         planets: [],
-        // styleObject: {
-        //     top: 0,
-        //     left: 0,
-        // }
-        posx: 0,
-        posy: 0,
         captureToggle: false,
+        windowwidth: '',
+        windowheight: '',
         x: 0,
         y: 0,
-        // xoffs: 500,
-        // yoffs: 50,
         mousex: 0,
         mousey: 0,
         zoom: 1,
+        zoomamount: 0.2,
         galaxysize: 10,
-        tilesizeinpx: 250,
-        galaxyborder: 20,
+        tilesizeinpx: 100,
+        galaxyborder: -20,
 
         // zoom: 0.500001,
     },
     methods: {
+        setSize() {
+            this.windowwidth = document.getElementById("window").offsetWidth;
+            this.windowheight = document.getElementById("window").offsetHeight;
+        },
         mo: function(evt) {
             if (this.captureToggle) {
                 this.x += (evt.x - this.mousex);
@@ -42,26 +40,41 @@ var app = new Vue({
             this.captureToggle = false;
         },
         zoomin() {
-            this.zoom += 0.1;
+            this.zoom = (parseFloat(this.zoom) + this.zoomamount).toFixed(1);
+            var xoffset = (this.centerPoint.x * (1 - ((this.zoom - this.zoomamount) / this.zoom)));
+            var yoffset = (this.centerPoint.y * (1 - ((this.zoom - this.zoomamount) / this.zoom)));
+            this.x = parseFloat((this.x + xoffset).toFixed(0));
+            this.y = parseFloat((this.y + yoffset).toFixed(0));
         },
         zoomout() {
-            this.zoom -= 0.1;
+            this.zoom = (parseFloat(this.zoom) - this.zoomamount).toFixed(1);
+            var xoffset = (this.centerPoint.x * (1 - ((this.zoom - this.zoomamount) / this.zoom)));
+            var yoffset = (this.centerPoint.y * (1 - ((this.zoom - this.zoomamount) / this.zoom)));
+            this.x = parseFloat((this.x - xoffset).toFixed(0));
+            this.y = parseFloat((this.y - yoffset).toFixed(0));
         },
         createarray() {
-            var hello = [];
+            var stars = [];
+            var planets = [];
+            var bgidprefix = "stars";
             for (var j = 0; j < this.galaxysize; j++) {
-                var row = [];
+                var starsrow = [];
+                var planetsrow = [];
                 for (var i = 0; i < this.galaxysize; i++) {
-                    row.push("");
+                    starsrow.push(bgidprefix + Math.floor(Math.random() * 5 + 1));
+                    planetsrow.push("");
                 }
-                hello.push(row);
+                stars.push(starsrow);
+                planets.push(planetsrow);
             }
-            this.divs = hello;
-            this.planets = hello;
+            this.divs = stars;
+            this.planets = planets;
 
-            this.planets[2][2] = "tile.png";
-            this.planets[9][1] = "tile.png";
-            this.planets[2][9] = "tile.png";
+            this.planets[2][2] = "images/tile.png";
+            this.planets[9][1] = "images/tile.png";
+            this.planets[2][9] = "images/tile.png";
+            this.planets[3][6] = "images/tile.png";
+            // this.planets[16][16] = "images/tile.png";
         },
     },
     computed: {
@@ -72,24 +85,28 @@ var app = new Vue({
             if (this.y > this.galaxyborder) {
                 this.y = this.galaxyborder;
             }
-            var width = document.getElementById("window").offsetWidth;
-            var height = document.getElementById("window").offsetHeight;
 
-            if (this.x < -this.galaxywidth + width - this.galaxyborder) {
-                this.x = -this.galaxywidth + width - this.galaxyborder;
+            if (this.x < this.maxx) {
+                this.x = this.maxx;
             }
-            if (this.y < -this.galaxyheight + height - this.galaxyborder) {
-                this.y = -this.galaxyheight + height - this.galaxyborder;
+            if (this.y < this.maxy) {
+                this.y = this.maxy;
             }
             return {
                 left: (this.x) + "px",
                 top: (this.y) + "px",
-            }
+            };
         },
         zoomStyleObject: function() {
-          return {
-                transform: "scale(" + this.zoom + ")",  
-          }
+            return {
+                transform: "scale(" + this.zoom + ")",
+            };
+        },
+        centerPoint() {
+            return {
+                x: this.x - (this.windowwidth / 2),
+                y: this.y - (this.windowheight / 2),
+            };
         },
         galaxywidth() {
             return this.galaxysize * this.tilesizeinpx;
@@ -97,10 +114,18 @@ var app = new Vue({
         galaxyheight() {
             return this.galaxysize * this.tilesizeinpx;
         },
+        maxx() {
+            return -(this.galaxywidth * this.zoom) + this.windowwidth - this.galaxyborder;
+        },
+        maxy() {
+            return -(this.galaxyheight * this.zoom) + this.windowheight - this.galaxyborder;
+        },
     },
 
     created() {
+        this.setSize();
         this.createarray();
+        window.addEventListener("resize", this.setSize);
         // window.addEventListener('scroll', this.zoom);
     },
 });

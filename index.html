@@ -8,25 +8,40 @@
 
 <body>
     <div id="app">
-        <div id="window" @mousedown="captureOn" @mouseup="captureOff" @mousemove="mo">
+        <div id="window" @mousedown="captureOn" @mouseup="captureOff" @mousemove="mo" @mouseleave="captureOff">
             <div id="ui">
+                <div id="debuginfo">
+                    <p>window: {{windowwidth}}x{{windowheight}}</p>
+                    <p>mousex: {{mousex}}</p>
+                    <p>mousey: {{mousey}}</p>
+                    <p>captureToggle: {{captureToggle}}</p>
+                    <br>
+                    <p>x: {{x}}</p>
+                    <p>y: {{y}}</p>
+                    <p>zoom: {{zoom}}</p>
+                    <p>center: ({{centerPoint.x}}, {{centerPoint.y}})</p>
+                </div>
                 <div id="zoombuttons">
                     <input type="button" v-on:click.prevent="zoomin" value="+">
                     <input type="button" v-on:click.prevent="zoomout" value="-">
                 </div>
             </div>
-            
-            v-bind:style="zoomStyleObject"
-            
+
+
+
             <div id="map" v-bind:style="styleObject">
-                <div id="background" class="layer">
-                    <div id="row" v-for="row in divs">
-                        <div class="cell bgcell" v-for="cell in row"></div>
+                <div id="zoomer" v-bind:style="zoomStyleObject">
+                    <div id="background" class="layer">
+                        <div id="row" v-for="row in divs">
+                            <div class="cell bgcell" :id="cell" v-for="cell in row"></div>
+                        </div>
                     </div>
-                </div>
-                <div id="planets" class="layer">
-                    <div id="row" v-for="row in planets">
-                        <div class="cell" v-for="cell in row"><img v-bind:src="cell"></div>
+                    <div id="planets" class="layer">
+                        <div id="row" v-for="row in planets">
+                            <div class="cell" v-for="cell in row">
+                                <img v-if="cell" v-bind:src="cell">
+                                </div>
+                        </div>
                     </div>
                 </div>
             </div>
